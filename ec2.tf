@@ -70,7 +70,10 @@ resource aws_instance my_instance {
 	key_name = aws_key_pair.my_key_pair.key_name	# Key pair
 
 	vpc_security_group_ids = [aws_security_group.my_security_group.id] # VPC & Security Group
-	
+
+	# Installing ngnix on server automation 
+	user_data = file("install_ngnix.sh")
+
 	# root storage (EBS)
 	root_block_device {
 		volume_size = 10
