@@ -60,27 +60,34 @@ resource aws_vpc_security_group_egress_rule allow_all_traffic {
 # EC2 instance
 
 
-resource aws_instance my_instance {
+resource "aws_instance" "my_instance" {
 
-	# count = 3
-	ami = "ami-0d76b909de1a0595d" # OS AMI ID
+  # count = 3
 
-	instance_type = "t3.micro" # Instance Type
+  ami           = "ami-0d76b909de1a0595d"   # Ubuntu AMI
+  instance_type = "t3.micro"                # EC2 Instance Type
 
-	key_name = aws_key_pair.my_key_pair.key_name	# Key pair
+  # Explicitly use Standard CPU credits
+  credit_specification {
+    cpu_credits = "standard"
+  }
 
-	vpc_security_group_ids = [aws_security_group.my_security_group.id] # VPC & Security Group
+  # Key Pair
+  key_name = aws_key_pair.my_key_pair.key_name
 
-	# Installing ngnix on server automation 
-	user_data = file("install_ngnix.sh")
+  # Security Group
+  vpc_security_group_ids = [aws_security_group.my_security_group.id]
 
-	# root storage (EBS)
-	root_block_device {
-		volume_size = 10
-		volume_type = "gp3"
-	}
+  # Install Nginx automatically
+  user_data = file("install_ngnix.sh")
 
-	tags = {
+  # Root EBS Volume
+  root_block_device {
+    volume_size = 10
+    volume_type = "gp3"
+  }
+
+  tags = {
     Name = "terra-automate-server"
   }
 }
